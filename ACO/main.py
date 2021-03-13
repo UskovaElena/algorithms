@@ -1,4 +1,6 @@
 import math
+import random
+import numpy as np
 
 
 def open_file(path):
@@ -14,29 +16,43 @@ def open_file(path):
 class AntColony:
     def __init__(self, coordinates):
         self.path = [0] * len(coordinates)
-        self.distance = -1
+        self.distance = 0
         self.best_distance = -1
         self.best_path = [0] * len(coordinates)
         self.coordinates = coordinates
-        self.pheromone = [[1] * (len(coordinates) - 1) for i in range(len(coordinates))]
+        self.pheromone = [[1] * (len(coordinates)) for i in range(len(coordinates))]
         self.alpha = 1
         self.beta = 1
         self.ro = 0.5
         self.q = 1
 
     def run(self):
+        self.distance = 0
+        city_from = random.randint(0, len(self.coordinates))
+        available_cities = [i for i in range(len(self.coordinates))]
+        available_cities.remove(city_from)
+        self.path[0] = city_from
+        for i in range(1, len(self.coordinates)):
+            sum_available = self.sum_available_ways(city_from, available_cities)
 
-        return
+            # определяем в какую вершину пойдем
+            probabilities = [self.calc_cost(city_from, city_to)/sum_available for city_to in available_cities]
+            next_city = np.random.choice(available_cities, p=probabilities)
+
+            available_cities.remove(next_city)
+            self.path[i] = next_city
+            self.distance += self.calc_len(city_from, next_city)
+            city_from = next_city
 
     #  считаем расстояние между двумя пунктами
     def calc_len(self, city_from, city_to):
-        return math.sqrt(self.ccoordinates[city_from][0] * self.ccoordinates[city_to][0] + self.ccoordinates[city_from][1] * self.ccoordinates[city_to][1])
+        return math.sqrt(self.coordinates[city_from][0] * self.coordinates[city_to][0] + self.coordinates[city_from][1] * self.coordinates[city_to][1])
 
-    #  считаем произведение локальной и глобальной "хорошести"
-    def calc_cost(self, city_from, city_to, ):
+    #  считаем произведение локальной и глобальной "хорошести"   ЧИСЛИТЕЛЬ
+    def calc_cost(self, city_from, city_to):
         return pow(self.pheromone[city_from][city_to], self.alpha) * pow(1/self.calc_len(city_from, city_to), self.beta)
 
-    #  считаем сумму вероятноестей всех путей, в которые можем попасть
+    #  считаем сумму вероятноестей всех путей, в которые можем попасть    ЗНАМЕНАТЕЛЬ
     def sum_available_ways(self, city_from, available_cities):
         sum = 0
         for city_to in available_cities:
@@ -52,3 +68,7 @@ class AntColony:
 
 
 ant = AntColony(open_file("C:\\Users\\Polina\\PycharmProject\\ant_colony_TSP\\cities.csv"))
+ant.run()
+print(ant.path, ant.distance)
+ant.run()
+print(ant.path, ant.distance)
