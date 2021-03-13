@@ -1,7 +1,7 @@
 import math
 import random
 import numpy as np
-
+import copy
 
 def open_file(path):
     points = []
@@ -17,7 +17,7 @@ class AntColony:
     def __init__(self, coordinates):
         self.path = [0] * len(coordinates)
         self.distance = 0
-        self.best_distance = -1
+        self.best_distance = 0
         self.best_path = [0] * len(coordinates)
         self.coordinates = coordinates
         self.pheromone = [[1] * (len(coordinates)) for i in range(len(coordinates))]
@@ -27,8 +27,11 @@ class AntColony:
         self.q = 1
 
     def run(self):
+        if self.distance < self.best_distance or self.best_distance == 0:
+            self.best_distance = self.distance
+            self.best_path = copy.deepcopy(self.path)
         self.distance = 0
-        city_from = random.randint(0, len(self.coordinates))
+        city_from = random.randint(0, len(self.coordinates) - 1)
         available_cities = [i for i in range(len(self.coordinates))]
         available_cities.remove(city_from)
         self.path[0] = city_from
@@ -68,7 +71,7 @@ class AntColony:
 
 
 ant = AntColony(open_file("C:\\Users\\Polina\\PycharmProject\\ant_colony_TSP\\cities.csv"))
-ant.run()
-print(ant.path, ant.distance)
-ant.run()
-print(ant.path, ant.distance)
+for i in range(100):
+    ant.run()
+    print(ant.path, ant.distance)
+print(ant.best_distance)
