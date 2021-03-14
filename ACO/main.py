@@ -49,7 +49,7 @@ class AntColony:
 
     #  считаем расстояние между двумя пунктами
     def calc_len(self, city_from, city_to):
-        return math.sqrt(self.coordinates[city_from][0] * self.coordinates[city_to][0] + self.coordinates[city_from][1] * self.coordinates[city_to][1])
+        return math.sqrt(pow(self.coordinates[city_from][0] - self.coordinates[city_to][0], 2) + pow(self.coordinates[city_from][1] - self.coordinates[city_to][1], 2))
 
     #  считаем произведение локальной и глобальной "хорошести"   ЧИСЛИТЕЛЬ
     def calc_cost(self, city_from, city_to):
@@ -70,7 +70,9 @@ class AntColony:
                 self.pheromone[self.path[i]][self.path[i + 1]] * self.ro + d_pheromone
 
 
-ant = AntColony(open_file("C:\\Users\\Polina\\PycharmProject\\ant_colony_TSP\\cities.csv"))
+# ant = AntColony(open_file("C:\\Users\\Polina\\PycharmProject\\ant_colony_TSP\\cities.csv"))
+ant = AntColony(open_file("C:\\repositories_git\\algorithms\ACO\\cities.csv"))
+print(ant.pheromone)
 for i in range(100):
     ant.run()
     print(ant.path, ant.distance)
