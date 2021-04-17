@@ -36,20 +36,32 @@ class VRPTW:
                 self.distances[i].append(math.sqrt(math.pow(self.shops[i].x - self.shops[j].x, 2) +
                                                  math.pow(self.shops[i].y - self.shops[j].y, 2)))
 
+
     #find first(initial) solution
     def initial_solution(self):
         self.vehicles.append(Vehicle(self.capacity))
+        self.vehicles[-1].path.append(0)
         best_shop = 0
-        best_time = self.vehicles[-1].time + self.distances[0][1]
-        for id in range(1, len(self.shops)):
-            if (self.vehicles[-1].time + self.distances[0][id-1] > self.shops[id].w_start and
-                    self.vehicles[-1].time + self.distances[0][id-1] < self.shops[id].w_end and
-                    self.vehicles[-1].time + self.distances[0][id - 1] < best_time and
-                    self.vehicles[-1].cargo_remains > self.shops[id].demand):
-                best_shop = id
-                best_time = self.vehicles[-1].time + self.distances[0][id-1]
-        self.vehicles[-1].path.append(best_shop)
-        self.visited.append(best_shop)
+        best_time = self.distances[0][1]
+        while self.vehicles[-1].cargo_remains > 0:
+            for id in range(1, len(self.shops)):
+                i = id
+                j = self.vehicles[-1].path[-1]
+                if id > self.vehicles[-1].path[-1]:
+                    i, j = j, i
+                if ( id not in self.visited and
+                     self.shops[id].w_start < self.vehicles[-1].time + self.distances[i][j - i - 1] < self.shops[id].w_end and
+                     self.distances[i][j - i - 1] < best_time and
+                     self.vehicles[-1].cargo_remains > self.shops[id].demand):
+                    best_shop = id
+                    best_time = self.distances[0][id-1]
+
+            print (best_shop not in self.visited, best_shop)
+            self.vehicles[-1].path.append(best_shop)
+            self.visited.append(best_shop)
+            self.vehicles[-1].cargo_remains -= self.shops[best_shop].demand
+            self.vehicles[-1].time += best_time
+        print(self.vehicles[-1].path)
 
 
 
