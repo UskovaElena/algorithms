@@ -1,7 +1,16 @@
 import math
+
+
 class Shop:
     def __init__(self, a):
-        self.id, self.x, self.y, self.demand, self.w_start, self.w_end, self.unloading = a
+        self.id, self.x, self.y, self.demand, self.w_start, self.w_end, self.service_time = a
+
+
+class Vehicle:
+    def __init__(self, capacity):
+        self.path = []
+        self.time = 0
+        self.cargo_remains = capacity
 
 
 class VRPTW:
@@ -9,13 +18,15 @@ class VRPTW:
     def __init__(self):
         self.shops = []
         self.n_vehicles = 0
-        self.capacity_vehicles = 0
+        self.capacity = 0
         self.distances = []
+        self.vehicles = []
+        self.visited = []
 
     # read file and fill fields of class
     def fill(self, path):
         with open(path) as f:
-            self.n_vehicles, self.capacity_vehicles  = f.readline().replace('\n','').split(' ')[1:]
+            self.n_vehicles, self.capacity = [int(a) for a in f.readline().replace('\n','').split(' ')[1:]]
             for line in f.readlines():
                 self.shops.append(Shop([int(a) for a in line.replace('\n', '').split(' ')[1:-1]]))
 
@@ -27,9 +38,22 @@ class VRPTW:
 
     #find first(initial) solution
     def initial_solution(self):
-        return
+        self.vehicles.append(Vehicle(self.capacity))
+        best_shop = 0
+        best_time = self.vehicles[-1].time + self.distances[0][1]
+        for id in range(1, len(self.shops)):
+            if (self.vehicles[-1].time + self.distances[0][id-1] > self.shops[id].w_start and
+                    self.vehicles[-1].time + self.distances[0][id-1] < self.shops[id].w_end and
+                    self.vehicles[-1].time + self.distances[0][id - 1] < best_time and
+                    self.vehicles[-1].cargo_remains > self.shops[id].demand):
+                best_shop = id
+                best_time = self.vehicles[-1].time + self.distances[0][id-1]
+        self.vehicles[-1].path.append(best_shop)
+        self.visited.append(best_shop)
+
 
 
 
 alg = VRPTW()
 alg.fill("C:/Users/Polina/PycharmProject/VRPTW/I1.txt")
+alg.initial_solution()
